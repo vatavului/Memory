@@ -17,15 +17,10 @@ public class MemoryGameController extends Coroutine implements ActionListener {
     private volatile ActionEvent event;
     private final MemoryGame game;
     /**
-     * the first CardButton that the user clicks on in search for a matching
+     * the pair of CardButtons that the user clicks on in search for a matching
      * pair
      */
-    private CardButton selection1 = null;
-    /**
-     * the second CardButton that the user clicks on in search for a matching
-     * pair
-     */
-    private CardButton selection2 = null;
+    private CardButton[] selected = new CardButton[2];
     /**
      * The number of times during a game that the user fails to find a matching
      * pair
@@ -69,48 +64,34 @@ public class MemoryGameController extends Coroutine implements ActionListener {
         boolean done = false;
         nextEvent();
         while (!done) {
-            selectFirstCard();
+            selectCard(0); // select the first card and flip it
             nextEvent();
-            selectSecondCard();
-            if (!selection1.getCard().equals(selection2.getCard())) {
+            selectCard(1); // select the second card and flip it
+            if (!selected[0].getCard().equals(selected[1].getCard())) {
                 misses++;
                 autoFlipTimer.start();
-                nextEvent();
+                nextEvent(); // the source of this event is either the timer or 
+                // a CardButton the user clicked on
                 autoFlipTimer.stop();//does nothing if autoFlipTimer has expired
-                selection1.flip();
-                selection2.flip();
-                if (event.getSource() == autoFlipTimer) {
-                    nextEvent();
-                }
+                selected[0].flip(); // flip the card so it is facing down
+                selected[1].flip(); // flip the card so it is facing down
             } else if (game.isEndOfGame()) {
                 done = true;
             } else {
                 nextEvent();
             }
-            selection1 = selection2 = null;
+            selected[0] = selected[1] = null;
         }
     }
 
-    private void selectFirstCard() throws InterruptedException {
-        assert event.getSource() instanceof CardButton;
-        CardButton cb = (CardButton) event.getSource();
-        while (cb.isFaceUp()) {
+    private void selectCard(int i) throws InterruptedException {
+        CardButton cb;
+        while (event.getSource() == autoFlipTimer
+                || (cb = (CardButton) event.getSource()).isFaceUp()) {
             nextEvent();
-            cb = (CardButton) event.getSource();
         }
         cb.flip();
-        selection1 = cb;
-    }
-
-    private void selectSecondCard() throws InterruptedException {
-        assert event.getSource() instanceof CardButton;
-        CardButton cb = (CardButton) event.getSource();
-        while (cb.isFaceUp()) {
-            nextEvent();
-            cb = (CardButton) event.getSource();
-        }
-        cb.flip();
-        selection2 = cb;
+        selected[i] = cb;
     }
 
     /**
@@ -164,7 +145,8 @@ public class MemoryGameController extends Coroutine implements ActionListener {
     }
 
     /**
-     * Starts the MemoryGameController thread. This method is called from the EDT.
+     * Starts the MemoryGameController thread. This method is called from the
+     * EDT.
      */
     public final void enter() {
         attach();
@@ -187,7 +169,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
 
     private void resetGame() {
         game.reset();
-        selection1 = selection2 = null;
+        selected[0] = selected[1] = null;
         misses = 0;
     }
 }
