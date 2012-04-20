@@ -48,7 +48,7 @@ public class MemoryGame extends JPanel implements Runnable {
      * columns (= 6).
      */
     private MemoryGame() {
-        this(4, 11);
+        this(3, 6);
     }
 
     /**
