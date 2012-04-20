@@ -14,7 +14,7 @@ import org.wintrisstech.cards.Deck;
  * each card, there is a matching card with the same suit and number. The user
  * clicks on one card then on another card. After each click, the selected card
  * is flipped, thus showing the card's face. If the two cards match, they remain
- * facing up. If they do not match, then, upon the user's next click or after 
+ * facing up. If they do not match, then, upon the user's next click or after
  * one second, whichever occurs first, the two cards are flipped so they face
  * down again. The game continues until all cards are facing up.
  *
@@ -41,21 +41,23 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * The ActionListener that handles clicks on all the CardButtons
      */
-    private MemoryGameController buttonListener = new MemoryGameController(this);
+    private coroutine.MemoryGameController buttonListener =
+            new coroutine.MemoryGameController(this);
 
     /**
-     * Creates an instance of the MemoryGame with default number of rows (= 3) and
-     * columns (= 6).
+     * Creates an instance of the MemoryGame with default number of rows (= 3)
+     * and columns (= 6).
      */
     private MemoryGame() {
         this(3, 6);
     }
 
     /**
-     * Creates an instance of the MemoryGame with numRows rows and numColumns columns.
+     * Creates an instance of the MemoryGame with numRows rows and numColumns
+     * columns.
      *
      * @param numRows the number of rows
-     * @param numColumns  the number of columns
+     * @param numColumns the number of columns
      */
     private MemoryGame(int numRows, int numColumns) {
         this.numRows = numRows;
@@ -71,15 +73,13 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * Starts the game.
      *
-     * @param args the command line arguments.
-     * <p> Either 0 or 2 arguments are accepted.
-     * If there are no arguments, then default number of rows and columns 
-     * apply. 
-     * <p> If there are two arguments, then
-     * they must be two parse-able integers. First argument is the number of
-     * rows, which must be between 1 and 5. The second argument is the number of
-     * columns, which must be between 1 and 10. Either the number of rows or the
-     * number of columns must be even.
+     * @param args the command line arguments. <p> Either 0 or 2 arguments are
+     * accepted. If there are no arguments, then default number of rows and
+     * columns apply. <p> If there are two arguments, then they must be two
+     * parse-able integers. First argument is the number of rows, which must be
+     * between 1 and 5. The second argument is the number of columns, which must
+     * be between 1 and 10. Either the number of rows or the number of columns
+     * must be even.
      *
      * @throws NumberFormatException if the line arguments are not two integers
      * @throws IllegalArgumentException if the first argument is not between 1
@@ -111,9 +111,10 @@ public class MemoryGame extends JPanel implements Runnable {
     }
 
     /**
-     * Initializes the MemoryGame. Generates a list of CardButtons and places them on
-     * a grid inside a JFrame.
+     * Initializes the MemoryGame. Generates a list of CardButtons and places
+     * them on a grid inside a JFrame.
      */
+    @Override
     public void run() {
         frame = new JFrame("Memory");
         setLayout(new GridLayout(numRows, numColumns));
@@ -129,13 +130,12 @@ public class MemoryGame extends JPanel implements Runnable {
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-//        buttonListener.start();
+        buttonListener.enter();
     }
 
     /**
      * Produces an array containing a random selection of cards where each card
-     * occurs exactly two times in the array. Cards occur in random order.
-     * <p>
+     * occurs exactly two times in the array. Cards occur in random order. <p>
      * The "inside-out" version of the Fisher-Yates shuffle algorithm, which
      * simultaneously initializes and shuffles the array, is used.
      *
@@ -165,7 +165,7 @@ public class MemoryGame extends JPanel implements Runnable {
      *
      * @return true if game is over
      */
-    boolean isEndOfGame() {
+    public boolean isEndOfGame() {
         for (CardButton button : buttonArray) {
             if (!button.isFaceUp()) {
                 //game is not over
@@ -178,7 +178,7 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * Re-initializes the game
      */
-    void reset() {
+    public void reset() {
         final Card[] selectedCards = selectCards();
         for (int i = 0; i < selectedCards.length; i++) {
             buttonArray[i].setCard(selectedCards[i]);

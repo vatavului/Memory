@@ -44,7 +44,7 @@ public class CardButton extends JButton {
      * Toggles the state of the CardButton from face up to face down or vice
      * versa.
      */
-    void flip() {
+    public void flip() {
         faceUp = !faceUp;
         setIcon(faceUp ? faceIcon : backIcon);
         repaint();
@@ -54,14 +54,14 @@ public class CardButton extends JButton {
      * Gets the state of the CardButton
      * @return true if the CardButton is in the face up state; false otherwise.
      */
-    boolean isFaceUp() {
+    public boolean isFaceUp() {
         return faceUp;
     }
 
     /**
      * @return the CardButton's associated Card
      */
-    Card getCard() {
+    public Card getCard() {
         return card;
     }
 
@@ -71,7 +71,7 @@ public class CardButton extends JButton {
      * @param card a non-null instance of Card
      * @throws IllegalArgumentException if the parameter is null
      */
-    void setCard(Card card) throws IllegalArgumentException {
+    public void setCard(Card card) throws IllegalArgumentException {
         if (card == null) {
             throw new IllegalArgumentException("Parameter card must be non-null.");
         }
