@@ -65,7 +65,6 @@ class MemoryGameController implements ActionListener {
 
         @Override
         public void clickUp(CardButton cb) {
-            assert false;
         }
 
         @Override
@@ -102,7 +101,6 @@ class MemoryGameController implements ActionListener {
                     selection1 = selection2 = null;
                     misses = 0;
                     currentState = noCardSelectedState;
-                    return;
                 } else {
                     System.exit(0);
                 }

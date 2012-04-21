@@ -33,7 +33,7 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * An array of all the CardButtons
      */
-    private CardButton[] buttonArray;
+    private CardButton[] buttons;
     /**
      * The JFrame which contains this game.
      */
@@ -41,7 +41,7 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * The ActionListener that handles clicks on all the CardButtons
      */
-    private coroutine.MemoryGameController buttonListener =
+    private coroutine.MemoryGameController controller =
             new coroutine.MemoryGameController(this);
 
     /**
@@ -63,9 +63,8 @@ public class MemoryGame extends JPanel implements Runnable {
         this.numRows = numRows;
         this.numColumns = numColumns;
         numCards = numRows * numColumns;
-        buttonArray = new CardButton[numCards];
+        buttons = new CardButton[numCards];
 //        deck = new Deck(Color.RED);
-//        deck = new Deck(Color.BLUE);
         deck = new Deck(Color.BLUE);
 //        deck = new Deck(MemoryGame.class.getResource("images/back-dwight-150-1.png"));
     }
@@ -121,16 +120,16 @@ public class MemoryGame extends JPanel implements Runnable {
         Card[] selectedCards = selectCards();
         for (int i = 0; i < numCards; i++) {
             CardButton cardButton = new CardButton(selectedCards[i]);
-            cardButton.addActionListener(buttonListener);
+            cardButton.addActionListener(controller);
             add(cardButton); //Adds the button to the grid
-            buttonArray[i] = cardButton; //Maintain an array of all the buttons
+            buttons[i] = cardButton; //Maintain an array of all the buttons
         }
         frame.add(this);
         frame.pack();
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        buttonListener.enter();
+        controller.enter();
     }
 
     /**
@@ -166,7 +165,7 @@ public class MemoryGame extends JPanel implements Runnable {
      * @return true if game is over
      */
     public boolean isEndOfGame() {
-        for (CardButton button : buttonArray) {
+        for (CardButton button : buttons) {
             if (!button.isFaceUp()) {
                 //game is not over
                 return false;
@@ -181,7 +180,7 @@ public class MemoryGame extends JPanel implements Runnable {
     public void reset() {
         final Card[] selectedCards = selectCards();
         for (int i = 0; i < selectedCards.length; i++) {
-            buttonArray[i].setCard(selectedCards[i]);
+            buttons[i].setCard(selectedCards[i]);
         }
     }
 }

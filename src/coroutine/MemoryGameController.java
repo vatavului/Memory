@@ -62,15 +62,15 @@ public class MemoryGameController extends Coroutine implements ActionListener {
 
     private void playGame() throws InterruptedException {
         boolean done = false;
-        nextEvent();
+        nextEvent(); //1
         while (!done) {
             selectCard(0); // select the first card and flip it
-            nextEvent();
+            nextEvent(); //2
             selectCard(1); // select the second card and flip it
             if (!selected[0].getCard().equals(selected[1].getCard())) {
                 misses++;
                 autoFlipTimer.start();
-                nextEvent(); // the source of this event is either the timer or 
+                nextEvent(); //3 the source of this event is either the timer or 
                 // a CardButton the user clicked on
                 autoFlipTimer.stop();//does nothing if autoFlipTimer has expired
                 selected[0].flip(); // flip the card so it is facing down
@@ -78,7 +78,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
             } else if (game.isEndOfGame()) {
                 done = true;
             } else {
-                nextEvent();
+                nextEvent(); //4
             }
             selected[0] = selected[1] = null;
         }
@@ -88,7 +88,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
         CardButton cb;
         while (event.getSource() == autoFlipTimer
                 || (cb = (CardButton) event.getSource()).isFaceUp()) {
-            nextEvent();
+            nextEvent();//5 
         }
         cb.flip();
         selected[i] = cb;
