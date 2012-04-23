@@ -129,7 +129,7 @@ public class MemoryGame extends JPanel implements Runnable {
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        controller.enter();
+        controller.attach();
     }
 
     /**

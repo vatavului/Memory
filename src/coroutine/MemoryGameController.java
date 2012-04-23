@@ -70,8 +70,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
             if (!selected[0].getCard().equals(selected[1].getCard())) {
                 misses++;
                 autoFlipTimer.start();
-                nextEvent(); //3 the source of this event is either the timer or 
-                // a CardButton the user clicked on
+                nextEvent(); //3 the source of this event is either the timer or a CardButton the user clicked on
                 autoFlipTimer.stop();//does nothing if autoFlipTimer has expired
                 selected[0].flip(); // flip the card so it is facing down
                 selected[1].flip(); // flip the card so it is facing down
@@ -144,13 +143,6 @@ public class MemoryGameController extends Coroutine implements ActionListener {
         }
     }
 
-    /**
-     * Starts the MemoryGameController thread. This method is called from the
-     * EDT.
-     */
-    public final void enter() {
-        attach();
-    }
 
     /**
      * This method is invoked from the EDT.
