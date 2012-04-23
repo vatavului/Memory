@@ -79,7 +79,6 @@ public class MemoryGameController extends Coroutine implements ActionListener {
             } else {
                 nextEvent(); //4
             }
-            selected[0] = selected[1] = null;
         }
     }
 
@@ -161,7 +160,6 @@ public class MemoryGameController extends Coroutine implements ActionListener {
 
     private void resetGame() {
         game.reset();
-        selected[0] = selected[1] = null;
         misses = 0;
     }
 }
