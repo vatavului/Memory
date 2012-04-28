@@ -2,10 +2,7 @@ package coroutine;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import memory.CardButton;
 import memory.MemoryGame;
@@ -30,10 +27,8 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      */
     private int misses = 0;
     /**
-     * Timer restarted upon entering state C (2 cards selected) and stopped upon
-     * exiting State C. If this timer expires, the two cards selected in State C
-     * are automatically flipped if they do not match, and a transition to State
-     * A (no cards selected) occurs.
+     * Timer started upon selecting two mismatched cards. When this timer
+     * expires, the two cards are flipped back again. 
      */
     private Timer autoFlipTimer = new Timer(1000, this);
 
@@ -119,7 +114,8 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      * @throws InterruptedException if the event handler thread is interrupted.
      */
     public final void nextEvent() throws InterruptedException {
-        detach(); // wait for the EDT to produce an event and call actionPerformed()
+        detach(); // wait for the EDT to produce an event and call 
+                  // actionPerformed() or to cancel
         if (isCancelled()) {
             event = null; // serves as EOF event
         }
