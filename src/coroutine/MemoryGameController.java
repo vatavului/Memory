@@ -2,6 +2,8 @@ package coroutine;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -16,6 +18,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
 
     private volatile ActionEvent event;
     private final MemoryGame game;
+    private boolean gameOver;
     /**
      * the pair of CardButtons that the user clicks on in search for a matching
      * pair
@@ -51,19 +54,15 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      */
     @Override
     public void execute() throws InterruptedException {
-        while (true) {
+        nextEvent();
+        while (event != null) {
             playGame();
-            if (!continuePlaying()) {
-                System.exit(0);
-            }
-            resetGame();
+            nextEvent();
         }
     }
 
     private void playGame() throws InterruptedException {
-        boolean done = false;
-        nextEvent(); //1
-        while (!done) {
+        while (!gameOver) {
             selectCard(0); // select the first card and flip it
             nextEvent(); //2
             selectCard(1); // select the second card and flip it
@@ -75,7 +74,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
                 selected[0].flip(); // flip the card so it is facing down
                 selected[1].flip(); // flip the card so it is facing down
             } else if (game.isEndOfGame()) {
-                done = true;
+                gameOver = true;
             } else {
                 nextEvent(); //4
             }
@@ -98,29 +97,13 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      * method is called from the event handler thread.
      *
      * @return
-     * @throws InterruptedException
      */
-    private boolean continuePlaying() throws InterruptedException {
-        final boolean[] res = new boolean[1];
-        //Place a Runnable on the EDQ
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    res[0] = JOptionPane.showConfirmDialog(
-                            null,
-                            "You had " + misses + " misses" + ".\nPlay again?",
-                            "End of Game", JOptionPane.YES_NO_OPTION)
-                            == JOptionPane.YES_OPTION;
-
-                    reattach(); // to pass control back to the event handler 
-                } catch (InterruptedException ex) {
-                }
-            }
-        });
-        detach(); // to let the Runnable run
-        return res[0];
+    private boolean continuePlaying() {
+        return JOptionPane.showConfirmDialog(
+                null,
+                "You had " + misses + " misses" + ".\nPlay again?",
+                "End of Game", JOptionPane.YES_NO_OPTION)
+                == JOptionPane.YES_OPTION;
     }
 
     /**
@@ -142,24 +125,33 @@ public class MemoryGameController extends Coroutine implements ActionListener {
         }
     }
 
-
     /**
      * This method is invoked from the EDT.
      *
      * @param event
+     * @see ActionListener
+     *
      */
     @Override
     public void actionPerformed(ActionEvent event) {
         try {
             this.event = event;
             reattach();
-            //
+            if (gameOver) {
+                if (continuePlaying()) {
+                    resetGame();
+                } else {
+                    cancel();
+                    System.exit(0);
+                }
+            }
         } catch (InterruptedException ex) {
         }
     }
 
     private void resetGame() {
         game.reset();
+        gameOver = false;
         misses = 0;
     }
 }
