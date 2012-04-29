@@ -7,35 +7,65 @@ import javax.swing.Timer;
 
 /**
  * This class handles ActionEvents that are fired when a user clicks on a
- * CardButton. The handling depends on the state of this ActionListener. <p>
- * There are 3 states, determined by how far the user has come in selecting a
- * pair of cards.
+ * CardButton. The handling depends on the state of this ActionListener.
  *
- * <ol> <li>State A: no cards selected. <li>State B: 1 card selected. <li>State
- * C: 2 cards selected. </ol>
+ * <p> There are 3 states, determined by how far the user has come in selecting
+ * a pair of cards.
  *
- * There are three kinds of events: <ol> <li> clickUp: user clicks on a
- * CardButton that is face up. <li> clickDown: user clicks on a CardButton that
- * is face down. <li> autoFlip: the autoFlipTimer fires. This event can only
- * occur in State C. </ol> The state transitions and the actions performed are
- * as shown below: <ol> <li> State A -- clickUp --> State A / Do nothing <li>
- * State A - clickDown -> State B / Clicked CardButton becomes 1st selection and
- * is flipped. <li> State B -- clickUp --> State B / Do nothing <li> State B -
- * clickDown -> State C / Selected CardButton becomes 2nd selection and is
- * flipped. End-of-game check. Start autoFlipTimer. <li> State C -- clickUp -->
- * State A / If 1st and 2nd selections do not match, they are flipped back
- * again. Selections are cleared. Stop autoFlipTimer <li> State C - clickDown ->
- * State B / If 1st and 2nd selections do not match, they are flipped back
- * again. Stop autoFlipTimer. Clicked CardButton becomes 1st selection and is
- * flipped. <li> State C - autoFlip --> State A / If 1st and 2nd selections do
- * not match, they are flipped back again. Selections are cleared. </ol>
+ * <ol>
+ *
+ * <li>State A: no cards selected.
+ *
+ * <li>State B: 1 card selected.
+ *
+ * <li>State C: 2 cards selected.
+ *
+ * </ol>
+ *
+ * There are three kinds of events:
+ *
+ * <ol>
+ *
+ * <li> clickUp: user clicks on a CardButton that is face up.
+ *
+ * <li> clickDown: user clicks on a CardButton that is face down.
+ *
+ * <li> autoFlip: the autoFlipTimer fires. This event can only occur in State C.
+ *
+ * </ol>
+ *
+ * The state transitions and the actions performed are as shown below:
+ *
+ * <ol>
+ *
+ * <li> State A -- clickUp --> State A / Do nothing
+ *
+ * <li> State A - clickDown -> State B / Clicked CardButton becomes 1st
+ * selection and is flipped.
+ *
+ * <li> State B -- clickUp --> State B / Do nothing
+ *
+ * <li> State B - clickDown -> State C / Selected CardButton becomes 2nd
+ * selection and is flipped. End-of-game check. Start autoFlipTimer.
+ *
+ * <li> State C -- clickUp --> State A / If 1st and 2nd selections do not match,
+ * they are flipped back again. Selections are cleared. Stop autoFlipTimer
+ *
+ * <li> State C - clickDown -> State B / If 1st and 2nd selections do not match,
+ * they are flipped back again. Stop autoFlipTimer. Clicked CardButton becomes
+ * 1st selection and is flipped.
+ *
+ * <li> State C - autoFlip --> State A / If 1st and 2nd selections do not match,
+ * they are flipped back again. Selections are cleared.
+ *
+ * </ol>
  *
  * @see CardButton
  * @see MemoryGame
  *
  * @author Erik Colban
  */
-class MemoryGameController implements ActionListener {
+public class MemoryGameController implements ActionListener {
 
     /**
      * the first CardButton that the user clicks on in search for a matching

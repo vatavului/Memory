@@ -35,10 +35,6 @@ public class MemoryGame extends JPanel implements Runnable {
      */
     private CardButton[] buttons;
     /**
-     * The JFrame which contains this game.
-     */
-    private JFrame frame;
-    /**
      * The ActionListener that handles clicks on all the CardButtons
      */
     private coroutine.MemoryGameController controller = new coroutine.MemoryGameController(this);
@@ -115,7 +111,7 @@ public class MemoryGame extends JPanel implements Runnable {
      */
     @Override
     public void run() {
-        frame = new JFrame("Memory");
+        JFrame frame = new JFrame("Memory");
         setLayout(new GridLayout(numRows, numColumns));
         Card[] selectedCards = selectCards();
         for (int i = 0; i < numCards; i++) {

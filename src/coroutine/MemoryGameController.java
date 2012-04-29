@@ -8,6 +8,7 @@ import memory.CardButton;
 import memory.MemoryGame;
 
 /**
+ * A coroutine based implementation of the controller.
  *
  * @author Erik
  */
@@ -28,10 +29,17 @@ public class MemoryGameController extends Coroutine implements ActionListener {
     private int misses = 0;
     /**
      * Timer started upon selecting two mismatched cards. When this timer
-     * expires, the two cards are flipped back again. 
+     * expires, the two cards are flipped back again.
      */
     private Timer autoFlipTimer = new Timer(1000, this);
 
+    /**
+     * Constructs an instance of the MemoryGameController. A MemoryGame instance
+     * is passed as argument, so that this controller can tell when the game to
+     * reset itself when a game is over.
+     *
+     * @param game the MemoryGame instance
+     */
     public MemoryGameController(MemoryGame game) {
         if (game == null) {
             throw new IllegalArgumentException("Argument must be non-null.");
@@ -48,7 +56,7 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      * @throws InterruptedException if the consumer thread is interrupted
      */
     @Override
-    public void execute() throws InterruptedException {
+    protected void execute() throws InterruptedException {
         nextEvent();
         while (event != null) {
             playGame();
@@ -56,6 +64,10 @@ public class MemoryGameController extends Coroutine implements ActionListener {
         }
     }
 
+    /**
+     * Plays a single game
+     * @throws InterruptedException 
+     */
     private void playGame() throws InterruptedException {
         while (!gameOver) {
             selectCard(0); // select the first card and flip it
@@ -110,12 +122,11 @@ public class MemoryGameController extends Coroutine implements ActionListener {
      * This method returns null if the last event has been encountered (i.e.,
      * <code>null</code> serves as an EOF indicator.
      *
-     * @return the most recent MouseEvent.
      * @throws InterruptedException if the event handler thread is interrupted.
      */
-    public final void nextEvent() throws InterruptedException {
+    private void nextEvent() throws InterruptedException {
         detach(); // wait for the EDT to produce an event and call 
-                  // actionPerformed() or to cancel
+        // actionPerformed() or to cancel
         if (isCancelled()) {
             event = null; // serves as EOF event
         }

@@ -45,8 +45,6 @@ package coroutine;
  * example of the usage of this class is given by
  * <code>IterableFile</code>.
  *
- * @see IterableFile
- *
  *
  * @author Erik
  */
