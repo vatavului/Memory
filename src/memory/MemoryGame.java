@@ -37,8 +37,8 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * The ActionListener that handles clicks on all the CardButtons
      */
-    private coroutine.MemoryGameController controller = new coroutine.MemoryGameController(this);
-//    private MemoryGameController controller = new MemoryGameController(this);
+//    private coroutine.MemoryGameController controller = new coroutine.MemoryGameController(this);
+    private MemoryGameController controller = new MemoryGameController(this);
 
     /**
      * Creates an instance of the MemoryGame with default number of rows (= 3)
@@ -125,7 +125,7 @@ public class MemoryGame extends JPanel implements Runnable {
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        controller.attach(); // Uncomment this line if using coroutine.MemoryGameController
+//        controller.attach(); // Uncomment this line if using coroutine.MemoryGameController
     }
 
     /**
