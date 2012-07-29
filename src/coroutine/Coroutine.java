@@ -11,7 +11,7 @@ package coroutine;
  * eventually yields control back to the invoker by calling {@link #detach()} or
  * when the
  * <code>attach()</code> method returns. When this happens, the invoker resumes
- * execution where it left off. 
+ * execution where it left off.
  *
  * <p> In turn, the
  * <code>detach()</code> method blocks until the invoker yields control back to
@@ -48,21 +48,26 @@ package coroutine;
  *
  * @author Erik
  */
-public abstract class Coroutine extends Thread {
+public abstract class Coroutine extends Thread
+{
 
-    private static class Trap {
+    private static class Trap
+    {
 
         private boolean toggle = false;
 
-        synchronized void entrap() throws InterruptedException {
+        synchronized void entrap() throws InterruptedException
+        {
             boolean v = toggle = !toggle;
             notify();
-            while (v == toggle) {
+            while (v == toggle)
+            {
                 wait();
             }
         }
 
-        synchronized void release() {
+        synchronized void release()
+        {
             toggle = !toggle;
             notify();
         }
@@ -74,11 +79,14 @@ public abstract class Coroutine extends Thread {
     /**
      * Starts the Coroutine thread. Called from the invoking thread.
      */
-    public final void attach() {
-        try {
+    public final void attach()
+    {
+        try
+        {
             start(); // start the coroutine thread
             trap.entrap(); // ... and wait for the control to be handed back.
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ex)
+        {
             ex.printStackTrace();
         }
     }
@@ -87,12 +95,15 @@ public abstract class Coroutine extends Thread {
      * Runs on the coroutine thread.
      */
     @Override
-    public final void run() {
-        try {
+    public final void run()
+    {
+        try
+        {
             execute(); //
             running = false;
             trap.release(); // Hand control over to invoking thread
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ex)
+        {
             running = false;
         }
     }
@@ -110,19 +121,22 @@ public abstract class Coroutine extends Thread {
      *
      * @throws InterruptedException
      */
-    protected final void detach() throws InterruptedException {
+    protected final void detach() throws InterruptedException
+    {
         trap.entrap();
     }
 
     /**
      * Called from the invoking thread. Yields to the coroutine.
      *
-     * @return false if the
-     * <code>execute()</code> method has returned, true otherwise.
+     * @return false if the <code>execute()</code> method has returned, true
+     * otherwise.
      * @throws InterruptedException
      */
-    public final boolean reattach() throws InterruptedException {
-        if (running) {
+    public final boolean reattach() throws InterruptedException
+    {
+        if (running)
+        {
             trap.entrap();
         }
         return running;
@@ -135,7 +149,8 @@ public abstract class Coroutine extends Thread {
      *
      * @return true if the coroutine has been canceled.
      */
-    public final boolean isCancelled() {
+    public final boolean isCancelled()
+    {
         return cancelled;
     }
 
@@ -145,7 +160,8 @@ public abstract class Coroutine extends Thread {
      *
      * @throws InterruptedException
      */
-    public final void cancel() throws InterruptedException {
+    public final void cancel() throws InterruptedException
+    {
         cancelled = true;
         reattach(); // allows the coroutine to do some housekeeping before dying
         join(); // wait for the coroutine to die

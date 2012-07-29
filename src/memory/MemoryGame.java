@@ -20,7 +20,8 @@ import org.wintrisstech.cards.Deck;
  *
  * @author Erik Colban
  */
-public class MemoryGame extends JPanel implements Runnable {
+public class MemoryGame extends JPanel implements Runnable
+{
 
     /**
      * The Deck from which Cards used in the game are selected.
@@ -44,7 +45,8 @@ public class MemoryGame extends JPanel implements Runnable {
      * Creates an instance of the MemoryGame with default number of rows (= 3)
      * and columns (= 6).
      */
-    private MemoryGame() {
+    private MemoryGame()
+    {
         this(3, 6);
     }
 
@@ -55,7 +57,8 @@ public class MemoryGame extends JPanel implements Runnable {
      * @param numRows the number of rows
      * @param numColumns the number of columns
      */
-    private MemoryGame(int numRows, int numColumns) {
+    private MemoryGame(int numRows, int numColumns)
+    {
         this.numRows = numRows;
         this.numColumns = numColumns;
         numCards = numRows * numColumns;
@@ -80,27 +83,37 @@ public class MemoryGame extends JPanel implements Runnable {
      * @throws IllegalArgumentException if the first argument is not between 1
      * and 5 or the second argument is not between 1 and 10.
      */
-    public static void main(String[] args) {
-        if (args.length == 2) {
-            try {
+    public static void main(String[] args)
+    {
+        if (args.length == 2)
+        {
+            try
+            {
                 int rows = Integer.parseInt(args[0]);
                 int cols = Integer.parseInt(args[1]);
-                if (rows < 1 || rows > 5) {
+                if (rows < 1 || rows > 5)
+                {
                     System.out.println("First argument (the number of rows) must be between 1 and 5.");
-                } else if (cols < 1 || cols > 10) {
+                } else if (cols < 1 || cols > 10)
+                {
                     System.out.println("Second argument (the number of columns) must be between 1 and 10.");
-                } else if (cols * rows % 2 != 0) {
+                } else if (cols * rows % 2 != 0)
+                {
                     System.out.println("Either the number of rows or the number of columns must be even.");
-                } else {
+                } else
+                {
 
                     SwingUtilities.invokeLater(new MemoryGame(rows, cols));
                 }
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex)
+            {
                 System.out.println("Arguments must be integers.");
             }
-        } else if (args.length == 0) {
+        } else if (args.length == 0)
+        {
             SwingUtilities.invokeLater(new MemoryGame());
-        } else {
+        } else
+        {
             System.out.println("0 or 2 arguments are accepted");
         }
     }
@@ -110,11 +123,13 @@ public class MemoryGame extends JPanel implements Runnable {
      * them on a grid inside a JFrame.
      */
     @Override
-    public void run() {
+    public void run()
+    {
         JFrame frame = new JFrame("Memory");
         setLayout(new GridLayout(numRows, numColumns));
         Card[] selectedCards = selectCards();
-        for (int i = 0; i < numCards; i++) {
+        for (int i = 0; i < numCards; i++)
+        {
             CardButton cardButton = new CardButton(selectedCards[i]);
             cardButton.addActionListener(controller);
             add(cardButton); //Adds the button to the grid
@@ -136,16 +151,20 @@ public class MemoryGame extends JPanel implements Runnable {
      *
      * @return the Card array
      */
-    private Card[] selectCards() {
+    private Card[] selectCards()
+    {
         assert numCards % 2 == 0;
-        if (deck.getCount() < numCards / 2) {
+        if (deck.getCount() < numCards / 2)
+        {
             deck.shuffle();
         }
         Card[] selection = new Card[numCards];
         Card card = deck.getCard();
         selection[0] = card;
-        for (int index = 1; index < numCards; index++) {
-            if ((index & 1) == 0) {
+        for (int index = 1; index < numCards; index++)
+        {
+            if ((index & 1) == 0)
+            {
                 card = deck.getCard();
             }
             int randomIndex = random.nextInt(index + 1);
@@ -160,9 +179,12 @@ public class MemoryGame extends JPanel implements Runnable {
      *
      * @return true if game is over
      */
-    public boolean isEndOfGame() {
-        for (CardButton button : buttons) {
-            if (!button.isFaceUp()) {
+    public boolean isEndOfGame()
+    {
+        for (CardButton button : buttons)
+        {
+            if (!button.isFaceUp())
+            {
                 //game is not over
                 return false;
             }
@@ -173,9 +195,11 @@ public class MemoryGame extends JPanel implements Runnable {
     /**
      * Re-initializes the game
      */
-    public void reset() {
+    public void reset()
+    {
         final Card[] selectedCards = selectCards();
-        for (int i = 0; i < selectedCards.length; i++) {
+        for (int i = 0; i < selectedCards.length; i++)
+        {
             buttons[i].setCard(selectedCards[i]);
         }
     }

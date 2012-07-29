@@ -65,7 +65,8 @@ import javax.swing.Timer;
  *
  * @author Erik Colban
  */
-public class MemoryGameController implements ActionListener {
+public class MemoryGameController implements ActionListener
+{
 
     /**
      * the first CardButton that the user clicks on in search for a matching
@@ -83,7 +84,8 @@ public class MemoryGameController implements ActionListener {
      */
     private int misses;
 
-    private interface State {
+    private interface State
+    {
 
         void clickUp(CardButton cb);
 
@@ -91,14 +93,16 @@ public class MemoryGameController implements ActionListener {
 
         void autoFlip();
     }
-    private State noCardSelectedState = new State() {
-
+    private State noCardSelectedState = new State()
+    {
         @Override
-        public void clickUp(CardButton cb) {
+        public void clickUp(CardButton cb)
+        {
         }
 
         @Override
-        public void clickDown(CardButton cb) {
+        public void clickDown(CardButton cb)
+        {
             assert selection1 == null && selection2 == null;
             // transition to state B (one card selected)
             selection1 = cb;
@@ -107,52 +111,62 @@ public class MemoryGameController implements ActionListener {
         }
 
         @Override
-        public void autoFlip() {
+        public void autoFlip()
+        {
             assert false;
         }
     };
-    private State oneCardSelectedState = new State() {
-
+    private State oneCardSelectedState = new State()
+    {
         @Override
-        public void clickUp(CardButton cb) {
+        public void clickUp(CardButton cb)
+        {
             //do nothing
         }
 
         @Override
-        public void clickDown(CardButton cb) {
+        public void clickDown(CardButton cb)
+        {
             assert selection1 != null && selection2 == null;
             // transition to state C (2 cards selected)
             selection2 = cb;
             selection2.flip();
-            if (game.isEndOfGame()) {
+            if (game.isEndOfGame())
+            {
                 // End of game; continue playing or exit.
-                if (continuePlaying()) {
+                if (continuePlaying())
+                {
                     game.reset();
                     selection1 = selection2 = null;
                     misses = 0;
                     currentState = noCardSelectedState;
-                } else {
+                } else
+                {
                     System.exit(0);
                 }
-            } else {
+            } else
+            {
                 currentState = twoCardsSelectedState;
                 autoFlipTimer.start();
             }
         }
 
         @Override
-        public void autoFlip() {
+        public void autoFlip()
+        {
             assert false;
         }
     };
-    private State twoCardsSelectedState = new State() {
-
+    private State twoCardsSelectedState = new State()
+    {
         @Override
-        public void clickUp(CardButton cb) {
+        public void clickUp(CardButton cb)
+        {
 
             autoFlipTimer.stop();
             // Check for a match:
-            if (!selection1.getCard().equals(selection2.getCard())) {
+            if (!selection1.getCard().equals(selection2.getCard()))
+            {
                 // no match
                 misses++;
                 selection1.flip(); // flip so card faces down again
@@ -161,13 +175,21 @@ public class MemoryGameController implements ActionListener {
             selection1 = null;
             selection2 = null;
             currentState = noCardSelectedState;
+            if (!cb.isFaceUp())
+            {
+                selection1 = cb;
+                selection1.flip();
+                currentState = oneCardSelectedState;
+            }
         }
 
         @Override
-        public void clickDown(CardButton cb) {
+        public void clickDown(CardButton cb)
+        {
             autoFlipTimer.stop();
             // Check for a match:
-            if (!selection1.getCard().equals(selection2.getCard())) {
+            if (!selection1.getCard().equals(selection2.getCard()))
+            {
                 // no match
                 misses++;
                 selection1.flip(); // flip so card faces down again
@@ -180,9 +202,11 @@ public class MemoryGameController implements ActionListener {
         }
 
         @Override
-        public void autoFlip() {
-            autoFlipTimer.stop();
-            if (!selection1.getCard().equals(selection2.getCard())) {
+        public void autoFlip()
+        {
+//            autoFlipTimer.stop();
+            if (!selection1.getCard().equals(selection2.getCard()))
+            {
                 misses++;
                 selection1.flip(); // flip so card faces down again
                 selection2.flip(); // flip so card faces down again
@@ -199,10 +223,11 @@ public class MemoryGameController implements ActionListener {
      * are automatically flipped if they do not match, and a transition to State
      * A (no cards selected) occurs.
      */
-    private Timer autoFlipTimer = new Timer(2000, new ActionListener() {
-
+    private Timer autoFlipTimer = new Timer(2000, new ActionListener()
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+        {
             currentState.autoFlip();
         }
     });
@@ -218,8 +243,10 @@ public class MemoryGameController implements ActionListener {
      * @param game the MemoryGame instance that contains the CardButtons for
      * which this CardButtonlistener handles the ActionEvents
      */
-    MemoryGameController(MemoryGame game) {
-        if (game == null) {
+    MemoryGameController(MemoryGame game)
+    {
+        if (game == null)
+        {
             throw new IllegalArgumentException("Argument must be non-null.");
         }
         this.game = game;
@@ -232,11 +259,14 @@ public class MemoryGameController implements ActionListener {
      * @param event the ActionEvent produced when a user clicks on a CardButton.
      */
     @Override
-    public void actionPerformed(java.awt.event.ActionEvent event) {
+    public void actionPerformed(java.awt.event.ActionEvent event)
+    {
         CardButton cb = (CardButton) event.getSource();
-        if (cb.isFaceUp()) {
+        if (cb.isFaceUp())
+        {
             currentState.clickUp(cb);
-        } else {
+        } else
+        {
             currentState.clickDown(cb);
         }
     }
@@ -246,7 +276,8 @@ public class MemoryGameController implements ActionListener {
      *
      * @return true is the user answers yes.
      */
-    private boolean continuePlaying() {
+    private boolean continuePlaying()
+    {
         return JOptionPane.showConfirmDialog(
                 null,
                 "You had " + misses + (misses == 1 ? " miss" : " misses") + ".\nPlay again?",
