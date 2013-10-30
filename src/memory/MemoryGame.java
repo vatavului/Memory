@@ -2,10 +2,15 @@ package memory;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
 import org.wintrisstech.cards.Card;
 import org.wintrisstech.cards.Deck;
 
@@ -17,190 +22,247 @@ import org.wintrisstech.cards.Deck;
  * facing up. If they do not match, then, upon the user's next click or after
  * one second, whichever occurs first, the two cards are flipped so they face
  * down again. The game continues until all cards are facing up.
- *
+ * 
  * @author Erik Colban
  */
-public class MemoryGame extends JPanel implements Runnable
-{
+@SuppressWarnings("serial")
+public class MemoryGame extends JPanel implements Runnable, ActionListener {
 
-    /**
-     * The Deck from which Cards used in the game are selected.
-     */
-    private final Deck deck;
-    private final int numRows;
-    private final int numColumns;
-    private final int numCards;
-    private final Random random = new Random();
-    /**
-     * An array of all the CardButtons
-     */
-    private CardButton[] buttons;
-    /**
-     * The ActionListener that handles clicks on all the CardButtons
-     */
-//    private coroutine.MemoryGameController controller = new coroutine.MemoryGameController(this);
-    private MemoryGameController controller = new MemoryGameController(this);
+	/**
+	 * Constants
+	 */
+	private static final int NUM_ROWS = 2;
+	private static final int NUM_COLUMNS = 3;
+	private static final int NUM_CARDS = NUM_ROWS * NUM_COLUMNS;
+	private static final int AUTOFLIP_TIME = 1000;
 
-    /**
-     * Creates an instance of the MemoryGame with default number of rows (= 3)
-     * and columns (= 6).
-     */
-    private MemoryGame()
-    {
-        this(3, 6);
-    }
+	/**
+	 * Variables associated with the state of the game
+	 */
+	private int state = 0; // 3 states total: 0, 1, and 2
+	private CardButton first; // first card button in selecting a pair
+	private CardButton second; // second card button in selecting a pair
+	private int misses = 0; //number of non-matching selected pairs
+	private int matches = 0; // number of matching selected pairs
 
-    /**
-     * Creates an instance of the MemoryGame with numRows rows and numColumns
-     * columns.
-     *
-     * @param numRows the number of rows
-     * @param numColumns the number of columns
-     */
-    private MemoryGame(int numRows, int numColumns)
-    {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
-        numCards = numRows * numColumns;
-        buttons = new CardButton[numCards];
-//        deck = new Deck(Color.RED);
-        deck = new Deck(Color.BLUE);
-//        deck = new Deck(MemoryGame.class.getResource("images/back-dwight-150-1.png"));
-    }
+	/**
+	 * Resources / helpers
+	 */
+	private final Deck deck; // A deck of cards
+	private final Random random = new Random(); //A random number generator
+	private final CardButton[] buttons; // An array to hold all the card buttons
+	private final Timer autoFlipTimer; // A timer used to automatically flip over two non-matching cards
 
-    /**
-     * Starts the game.
-     *
-     * @param args the command line arguments. <p> Either 0 or 2 arguments are
-     * accepted. If there are no arguments, then default number of rows and
-     * columns apply. <p> If there are two arguments, then they must be two
-     * parse-able integers. First argument is the number of rows, which must be
-     * between 1 and 5. The second argument is the number of columns, which must
-     * be between 1 and 10. Either the number of rows or the number of columns
-     * must be even.
-     *
-     * @throws NumberFormatException if the line arguments are not two integers
-     * @throws IllegalArgumentException if the first argument is not between 1
-     * and 5 or the second argument is not between 1 and 10.
-     */
-    public static void main(String[] args)
-    {
-        if (args.length == 2)
-        {
-            try
-            {
-                int rows = Integer.parseInt(args[0]);
-                int cols = Integer.parseInt(args[1]);
-                if (rows < 1 || rows > 5)
-                {
-                    System.out.println("First argument (the number of rows) must be between 1 and 5.");
-                } else if (cols < 1 || cols > 10)
-                {
-                    System.out.println("Second argument (the number of columns) must be between 1 and 10.");
-                } else if (cols * rows % 2 != 0)
-                {
-                    System.out.println("Either the number of rows or the number of columns must be even.");
-                } else
-                {
+	// private coroutine.MemoryGameController controller = new
+	// coroutine.MemoryGameController(this);
 
-                    SwingUtilities.invokeLater(new MemoryGame(rows, cols));
-                }
-            } catch (NumberFormatException ex)
-            {
-                System.out.println("Arguments must be integers.");
-            }
-        } else if (args.length == 0)
-        {
-            SwingUtilities.invokeLater(new MemoryGame());
-        } else
-        {
-            System.out.println("0 or 2 arguments are accepted");
-        }
-    }
+	/**
+	 * Creates an instance of the MemoryGame with numRows rows and numColumns
+	 * columns.
+	 * 
+	 */
+	private MemoryGame() {
 
-    /**
-     * Initializes the MemoryGame. Generates a list of CardButtons and places
-     * them on a grid inside a JFrame.
-     */
-    @Override
-    public void run()
-    {
-        JFrame frame = new JFrame("Memory");
-        setLayout(new GridLayout(numRows, numColumns));
-        Card[] selectedCards = selectCards();
-        for (int i = 0; i < numCards; i++)
-        {
-            CardButton cardButton = new CardButton(selectedCards[i]);
-            cardButton.addActionListener(controller);
-            add(cardButton); //Adds the button to the grid
-            buttons[i] = cardButton; //Maintain an array of all the buttons
-        }
-        frame.add(this);
-        frame.pack();
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-//        controller.attach(); // Uncomment this line if using coroutine.MemoryGameController
-    }
+		buttons = new CardButton[NUM_CARDS];
+		deck = new Deck(Color.RED);
+		autoFlipTimer = new Timer(AUTOFLIP_TIME, this);
+		autoFlipTimer.setRepeats(false); //prevents the timer from automatically restarting after expiring
+	}
 
-    /**
-     * Produces an array containing a random selection of cards where each card
-     * occurs exactly two times in the array. Cards occur in random order. <p>
-     * The "inside-out" version of the Fisher-Yates shuffle algorithm, which
-     * simultaneously initializes and shuffles the array, is used.
-     *
-     * @return the Card array
-     */
-    private Card[] selectCards()
-    {
-        assert numCards % 2 == 0;
-        if (deck.getCount() < numCards / 2)
-        {
-            deck.shuffle();
-        }
-        Card[] selection = new Card[numCards];
-        Card card = deck.getCard();
-        selection[0] = card;
-        for (int index = 1; index < numCards; index++)
-        {
-            if ((index & 1) == 0)
-            {
-                card = deck.getCard();
-            }
-            int randomIndex = random.nextInt(index + 1);
-            selection[index] = selection[randomIndex];
-            selection[randomIndex] = card;
-        }
-        return selection;
-    }
+	/**
+	 * Starts the game.
+	 * 
+	 */
+	public static void main(String[] args) {
 
-    /**
-     * Check if game is over.
-     *
-     * @return true if game is over
-     */
-    public boolean isEndOfGame()
-    {
-        for (CardButton button : buttons)
-        {
-            if (!button.isFaceUp())
-            {
-                //game is not over
-                return false;
-            }
-        }
-        return true; // game is over
-    }
+		SwingUtilities.invokeLater(new MemoryGame());
+	}
 
-    /**
-     * Re-initializes the game
-     */
-    public void reset()
-    {
-        final Card[] selectedCards = selectCards();
-        for (int i = 0; i < selectedCards.length; i++)
-        {
-            buttons[i].setCard(selectedCards[i]);
-        }
-    }
+	/**
+	 * Initializes the MemoryGame. Generates a list of CardButtons and places
+	 * them on a grid inside a JFrame.
+	 */
+	@Override
+	public void run() {
+		JFrame frame = new JFrame("Memory");
+		setLayout(new GridLayout(NUM_ROWS, NUM_COLUMNS));
+		Card[] selectedCards = selectCards();
+		for (int i = 0; i < NUM_CARDS; i++) {
+			CardButton cardButton = new CardButton(selectedCards[i]);
+			cardButton.addActionListener(this);
+			add(cardButton); // Adds the button to the grid
+			buttons[i] = cardButton; // Maintain an array of all the buttons
+		}
+		frame.add(this);
+		frame.pack();
+		frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+	}
+
+	/**
+	 * Produces an array containing a random selection of cards where each card
+	 * occurs exactly two times in the array. Cards occur in random order.
+	 * <p>
+	 * The "inside-out" version of the Fisher-Yates shuffle algorithm, which
+	 * simultaneously initializes and shuffles the array, is used.
+	 * 
+	 * @return the Card array
+	 */
+	private Card[] selectCards() {
+		if (deck.getCount() < NUM_CARDS / 2) {
+			deck.shuffle();
+		}
+		Card[] selection = new Card[NUM_CARDS];
+		Card card = deck.getCard();
+		selection[1] = selection[0] = card;
+		for (int index = 2; index < NUM_CARDS; index++) {
+			if ((index & 1) == 0) {
+				card = deck.getCard();
+			}
+			int randomIndex = random.nextInt(index + 1);
+			selection[index] = selection[randomIndex];
+			selection[randomIndex] = card;
+		}
+		return selection;
+	}
+
+	/**
+	 * Handles action events. The state diagram is shown below.
+	 * <pre>
+	 *    +-+               +-+
+	 *c.u.| |           c.u.| |
+	 *    | V               | V
+	 *  +-----+           +-----+
+	 *  |  0  |   c.d.    |  1  |
+	 *  |     |---------->|     |<---+
+	 *  +-----+           +-----+    |
+	 *    ^ ^                |       |
+	 *    | |                |c.d.   |
+	 *    | |           Y    |       |
+	 *c.u.| +-------------[ match?]  |c.d.
+	 *t.e.|                  | N     |
+	 *    |    +-----+       |       |           
+	 *    +----|  2  |<------+       |
+	 *         |     |---------------+
+	 *         +-----+               
+	 * </pre>
+	 * 
+	 * There are three states; 0, 1 and 2, the number representing how many cards 
+	 * of the last pair is facing up. The event "c.d." is short for a button click
+	 * on a card button facing down, and "c.u." is short for a button click on a
+	 * card facing up. The event "t.e." is the event when the auto-flip timer 
+	 * expires.
+	 * <p>
+	 * The handling of the c.u. and c.d. events is done by the method 
+	 * {@link #handleClick(CardButton)},
+	 * whereas the handling of the timer expiration is done by the method 
+	 * {@link #autoFlip()}.
+	 * 
+	 * @param evt an event coming from the auto-flip timer or from a button click
+	 */
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		if (evt.getSource() == autoFlipTimer) {
+			autoFlip();
+		} else {
+			CardButton button = (CardButton) evt.getSource();
+			handleClick(button);
+		}
+	}
+
+	/**
+	 * Handles a click on one of the card buttons.
+	 * @param button the button that was clicked
+	 */
+	private void handleClick(CardButton button) {
+		switch (state) {
+		case 0:
+			if (button.isFaceUp()) {
+				//do nothing
+			} else {
+				first = button;
+				first.flip(); // face up
+				state = 1;
+			}
+			break;
+		case 1:
+			if (button.isFaceUp()) {
+				// do nothing
+			} else {
+				second = button;
+				second.flip(); //face up
+				if (first.getCard().equals(second.getCard())) {
+					matches++;
+					if (endOfGame()) {
+						if (playAgain()) {
+							resetGame();
+						} else {
+							System.exit(0);
+						}
+					}
+					state = 0;
+				} else {
+					misses++;
+					autoFlipTimer.start();
+					state = 2;
+				}
+			}
+			break;
+		case 2:
+			autoFlipTimer.stop();
+			first.flip(); //face down
+			second.flip(); //face down
+			if (button.isFaceUp()) {
+				state = 0;
+			} else {
+				first = button;
+				first.flip(); //face up
+				state = 1;
+			}
+			break;
+		default:
+		}
+	}
+
+	/**
+	 * Handles the expiration of the auto-flip timer.
+	 */
+	private void autoFlip() {
+		if (state == 2) { //This test is need in case of race condition
+			first.flip();
+			second.flip();
+			state = 0;
+		}
+	}
+	
+	/**
+	 * Checks if the end of the game has been reached.
+	 * @return true if end of game
+	 */
+	private boolean endOfGame() {
+		return matches * 2 == NUM_CARDS;
+	}
+
+	/**
+	 * Asks the user if he/she wants to play again. 
+	 * @return true if the user wants to play again.
+	 */
+	private boolean playAgain() {
+		return JOptionPane.showConfirmDialog(this, "You had " + misses
+				+ (misses == 1 ? " miss" : " misses") + ".\nPlay again?",
+				"End of Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+
+	}
+
+	/**
+	 * Re-initializes the game
+	 */
+	private void resetGame() {
+		final Card[] selectedCards = selectCards();
+		for (int i = 0; i < selectedCards.length; i++) {
+			buttons[i].setCard(selectedCards[i]);
+		}
+		misses = matches = 0;
+	}
 }
