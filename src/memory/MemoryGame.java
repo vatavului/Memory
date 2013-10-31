@@ -23,7 +23,7 @@ import org.wintrisstech.cards.Deck;
  * one second, whichever occurs first, the two cards are flipped so they face
  * down again. The game continues until all cards are facing up.
  * 
- * @author Erik Colban
+ * @author Erik Colban &copy; 2013
  */
 @SuppressWarnings("serial")
 public class MemoryGame extends JPanel implements Runnable, ActionListener {
@@ -31,8 +31,8 @@ public class MemoryGame extends JPanel implements Runnable, ActionListener {
 	/**
 	 * Constants
 	 */
-	private static final int NUM_ROWS = 2;
-	private static final int NUM_COLUMNS = 3;
+	private static final int NUM_ROWS = 4;
+	private static final int NUM_COLUMNS = 6;
 	private static final int NUM_CARDS = NUM_ROWS * NUM_COLUMNS;
 	private static final int AUTOFLIP_TIME = 1000;
 
@@ -132,7 +132,7 @@ public class MemoryGame extends JPanel implements Runnable, ActionListener {
 	 * <pre>
 	 *    +-+               +-+
 	 *c.u.| |           c.u.| |
-	 *    | V               | V
+	 *    | v               | v
 	 *  +-----+           +-----+
 	 *  |  0  |   c.d.    |  1  |
 	 *  |     |---------->|     |<---+
@@ -140,7 +140,7 @@ public class MemoryGame extends JPanel implements Runnable, ActionListener {
 	 *    ^ ^                |       |
 	 *    | |                |c.d.   |
 	 *    | |           Y    |       |
-	 *c.u.| +-------------[ match?]  |c.d.
+	 *c.u.| +-------------[match?]   |c.d.
 	 *t.e.|                  | N     |
 	 *    |    +-----+       |       |           
 	 *    +----|  2  |<------+       |
@@ -194,13 +194,7 @@ public class MemoryGame extends JPanel implements Runnable, ActionListener {
 				second.flip(); //face up
 				if (first.getCard().equals(second.getCard())) {
 					matches++;
-					if (endOfGame()) {
-						if (playAgain()) {
-							resetGame();
-						} else {
-							System.exit(0);
-						}
-					}
+					endOfGameCheck();
 					state = 0;
 				} else {
 					misses++;
@@ -226,10 +220,27 @@ public class MemoryGame extends JPanel implements Runnable, ActionListener {
 	}
 
 	/**
+	 * Checks if the end of the game has been reached and, if so, 
+	 * asks the user if he/she wants to play again. If the user does
+	 * not want to play again, the program shuts down.
+	 * 
+	 * @return true if end of game
+	 */
+	private void endOfGameCheck() {
+		if (endOfGame()) {
+			if (playAgain()) {
+				resetGame();
+			} else {
+				System.exit(0);
+			}
+		}
+	}
+
+	/**
 	 * Handles the expiration of the auto-flip timer.
 	 */
 	private void autoFlip() {
-		if (state == 2) { //This test is need in case of race condition
+		if (state == 2) { //This test is needed in case of race condition
 			first.flip();
 			second.flip();
 			state = 0;

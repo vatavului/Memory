@@ -86,8 +86,8 @@ public class CardButton extends JButton {
 					"Parameter card must be non-null.");
 		}
 		this.card = card;
-		faceUp = false;
 		faceIcon = new ImageIcon(card.getFaceImage());
+		faceUp = false;
 		setIcon(backIcon);
 		repaint();
 	}
